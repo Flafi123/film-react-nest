@@ -9,9 +9,10 @@ import { FilmsController } from './films/films.controller';
 import { OrderController } from './order/order.controller';
 import { FilmsService } from './films/films.service';
 import { OrderService } from './order/order.service';
-
 import { FilmsRepository } from './repository/films.repository';
+import { OrdersRepository } from './repository/orders.repository';
 import { FilmSchema } from './repository/film.schema';
+import { OrderSchema } from './repository/order.schema';
 
 @Module({
   imports: [
@@ -23,11 +24,16 @@ import { FilmSchema } from './repository/film.schema';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL') || 'mongodb://localhost:27017/afisha_db',
+        uri:
+          configService.get<string>('DATABASE_URL') ||
+          'mongodb://localhost:27017/afisha_db',
       }),
     }),
 
-    MongooseModule.forFeature([{ name: 'Film', schema: FilmSchema }]),
+    MongooseModule.forFeature([
+      { name: 'Film', schema: FilmSchema },
+      { name: 'Order', schema: OrderSchema },
+    ]),
 
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
@@ -35,6 +41,12 @@ import { FilmSchema } from './repository/film.schema';
     }),
   ],
   controllers: [FilmsController, OrderController],
-  providers: [configProvider, FilmsService, OrderService, FilmsRepository],
+  providers: [
+    configProvider,
+    FilmsService,
+    OrderService,
+    FilmsRepository,
+    OrdersRepository,
+  ],
 })
 export class AppModule {}
