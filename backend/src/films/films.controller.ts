@@ -1,6 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { FilmsService } from './films.service';
-import { FilmResponseDto, ScheduleResponseDto } from './dto/films.dto';
 
 @Controller('films')
 export class FilmsController {
@@ -19,7 +18,7 @@ export class FilmsController {
   async getSchedule(@Param('id') id: string) {
     const scheduleResult = await this.filmsService.findSchedule(id);
     const sessions = scheduleResult?.sessions || [];
-    
+
     return {
       items: sessions,
       total: sessions.length,

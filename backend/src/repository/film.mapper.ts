@@ -1,16 +1,16 @@
-import { IFilm } from './film.schema';
-import { FilmResponseDto, ScheduleResponseDto } from '../films/dto/films.dto';
-
+import { FilmEntity } from './film.entity';
 export class FilmMapper {
   private static cleanImagePath(path: string): string {
     return path.startsWith('/') ? path.slice(1) : path;
   }
-  
 
-  static toResponseDto(film: IFilm): FilmResponseDto {
+  static toResponseDto(film: FilmEntity) {
     let correctedImage = film.image;
     if (correctedImage.includes('content/afishabg')) {
-      correctedImage = correctedImage.replace('content/afishabg', 'content/afisha/bg');
+      correctedImage = correctedImage.replace(
+        'content/afishabg',
+        'content/afisha/bg',
+      );
     }
     return {
       id: film.id,
@@ -18,21 +18,23 @@ export class FilmMapper {
       director: film.director,
       rating: film.rating,
       tags: film.tags,
-      image: this.cleanImagePath(film.image),
-      cover: this.cleanImagePath(film.cover),
+      image: FilmMapper.cleanImagePath(film.image),
+      cover: FilmMapper.cleanImagePath(film.cover),
       about: film.about,
       description: film.description,
     };
   }
 
-  static toScheduleDto(film: IFilm): ScheduleResponseDto {
+  static toScheduleDto(film: FilmEntity) {
     return {
       filmId: film.id,
-      sessions: film.schedule.map((session) => ({
-        id: session.id,
-        time: session.daytime,
-        price: session.price,
-      })),
+      sessions: film.schedule
+        ? film.schedule.map((session) => ({
+            id: session.id,
+            time: session.daytime,
+            price: session.price,
+          }))
+        : [],
     };
   }
 }

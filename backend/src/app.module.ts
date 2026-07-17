@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'node:path';
 
 import { configProvider } from './app.config.provider';
@@ -11,8 +11,10 @@ import { FilmsService } from './films/films.service';
 import { OrderService } from './order/order.service';
 import { FilmsRepository } from './repository/films.repository';
 import { OrdersRepository } from './repository/orders.repository';
-import { FilmSchema } from './repository/film.schema';
-import { OrderSchema } from './repository/order.schema';
+
+import { FilmEntity } from './repository/film.entity';
+import { OrderEntity } from './repository/order.entity';
+import { ScheduleEntity } from './repository/schedule.entity';
 
 @Module({
   imports: [
@@ -21,24 +23,32 @@ import { OrderSchema } from './repository/order.schema';
       cache: true,
     }),
 
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri:
+      useFactory: (configService: ConfigService) => {
+        const rawUrl =
           configService.get<string>('DATABASE_URL') ||
-          'mongodb://localhost:27017/afisha_db',
-      }),
+          'postgres://localhost:5432/project_db';
+        const username =
+          configService.get<string>('DATABASE_USERNAME') || 'project_user';
+        const password =
+          configService.get<string>('DATABASE_PASSWORD') || 'user_password';
+
+        const cleanUrl = rawUrl.replace('postgres://', '');
+
+        return {
+          type: 'postgres',
+          url: `postgres://${username}:${password}@${cleanUrl}`,
+          entities: [FilmEntity, OrderEntity, ScheduleEntity],
+          synchronize: true, // Таблицы пересоздадутся автоматически
+        };
+      },
     }),
 
-    MongooseModule.forFeature([
-      { name: 'Film', schema: FilmSchema },
-      { name: 'Order', schema: OrderSchema },
-    ]),
+    TypeOrmModule.forFeature([FilmEntity, OrderEntity, ScheduleEntity]),
 
     ServeStaticModule.forRoot({
-      // Нацеливаем rootPath прямо на папку afisha
       rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
-      // Привязываем её к URL /content/afisha
       serveRoot: '/content/afisha',
     }),
   ],
