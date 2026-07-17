@@ -7,12 +7,22 @@ export class FilmsController {
   constructor(private readonly filmsService: FilmsService) {}
 
   @Get()
-  async getFilms(): Promise<FilmResponseDto[]> {
-    return this.filmsService.findAll();
+  async getFilms() {
+    const films = await this.filmsService.findAll();
+    return {
+      items: films,
+      total: films.length,
+    };
   }
 
   @Get(':id/schedule')
-  async getSchedule(@Param('id') id: string): Promise<ScheduleResponseDto> {
-    return this.filmsService.findSchedule(id);
+  async getSchedule(@Param('id') id: string) {
+    const scheduleResult = await this.filmsService.findSchedule(id);
+    const sessions = scheduleResult?.sessions || [];
+    
+    return {
+      items: sessions,
+      total: sessions.length,
+    };
   }
 }

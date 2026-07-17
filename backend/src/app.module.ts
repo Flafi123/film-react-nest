@@ -36,7 +36,9 @@ import { OrderSchema } from './repository/order.schema';
     ]),
 
     ServeStaticModule.forRoot({
+      // Нацеливаем rootPath прямо на папку afisha
       rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
+      // Привязываем её к URL /content/afisha
       serveRoot: '/content/afisha',
     }),
   ],
