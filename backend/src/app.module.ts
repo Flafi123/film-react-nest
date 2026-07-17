@@ -25,24 +25,16 @@ import { ScheduleEntity } from './repository/schedule.entity';
 
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const rawUrl =
-          configService.get<string>('DATABASE_URL') ||
-          'postgres://localhost:5432/project_db';
-        const username =
-          configService.get<string>('DATABASE_USERNAME') || 'project_user';
-        const password =
-          configService.get<string>('DATABASE_PASSWORD') || 'user_password';
-
-        const cleanUrl = rawUrl.replace('postgres://', '');
-
-        return {
-          type: 'postgres',
-          url: `postgres://${username}:${password}@${cleanUrl}`,
-          entities: [FilmEntity, OrderEntity, ScheduleEntity],
-          synchronize: true, // Таблицы пересоздадутся автоматически
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DATABASE_HOST') || 'localhost',
+        port: parseInt(configService.get<string>('DATABASE_PORT'), 10) || 5432,
+        database: configService.get<string>('DATABASE_NAME') || 'project_db',
+        username: configService.get<string>('DATABASE_USERNAME'),
+        password: configService.get<string>('DATABASE_PASSWORD'),
+        entities: [FilmEntity, OrderEntity, ScheduleEntity],
+        synchronize: false,
+      }),
     }),
 
     TypeOrmModule.forFeature([FilmEntity, OrderEntity, ScheduleEntity]),
