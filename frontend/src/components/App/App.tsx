@@ -15,7 +15,6 @@ import {useAppState} from "../../hooks/useAppState.tsx";
 
 function App() {
     const { state, data, handlers } = useAppState();
-
     return (<>
         <Layout isLocked={!!state.modal}>
            <Header counter={state.basket.length} onClick={handlers.handleOpenBasket} />
@@ -74,5 +73,4 @@ function App() {
         </Modal>}
     </>)
 }
-
 export default App

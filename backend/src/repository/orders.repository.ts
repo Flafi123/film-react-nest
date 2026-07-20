@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { IOrder } from './order.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { OrderEntity } from './order.entity';
 
 @Injectable()
 export class OrdersRepository {
   constructor(
-    @InjectModel('Order') private readonly orderModel: Model<IOrder>,
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
-  async create(orderData: any): Promise<IOrder> {
-    const newOrder = new this.orderModel(orderData);
-    return newOrder.save();
+  async create(orderData: Partial<OrderEntity>): Promise<OrderEntity> {
+    const newOrder = this.orderRepository.create(orderData);
+    return this.orderRepository.save(newOrder);
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'node:path';
 
 import { configProvider } from './app.config.provider';
@@ -11,8 +11,10 @@ import { FilmsService } from './films/films.service';
 import { OrderService } from './order/order.service';
 import { FilmsRepository } from './repository/films.repository';
 import { OrdersRepository } from './repository/orders.repository';
-import { FilmSchema } from './repository/film.schema';
-import { OrderSchema } from './repository/order.schema';
+
+import { FilmEntity } from './repository/film.entity';
+import { OrderEntity } from './repository/order.entity';
+import { ScheduleEntity } from './repository/schedule.entity';
 
 @Module({
   imports: [
@@ -21,19 +23,21 @@ import { OrderSchema } from './repository/order.schema';
       cache: true,
     }),
 
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        uri:
-          configService.get<string>('DATABASE_URL') ||
-          'mongodb://localhost:27017/afisha_db',
+        type: 'postgres',
+        host: configService.get<string>('DATABASE_HOST') || 'localhost',
+        port: parseInt(configService.get<string>('DATABASE_PORT'), 10) || 5432,
+        database: configService.get<string>('DATABASE_NAME') || 'project_db',
+        username: configService.get<string>('DATABASE_USERNAME'),
+        password: configService.get<string>('DATABASE_PASSWORD'),
+        entities: [FilmEntity, OrderEntity, ScheduleEntity],
+        synchronize: false,
       }),
     }),
 
-    MongooseModule.forFeature([
-      { name: 'Film', schema: FilmSchema },
-      { name: 'Order', schema: OrderSchema },
-    ]),
+    TypeOrmModule.forFeature([FilmEntity, OrderEntity, ScheduleEntity]),
 
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
