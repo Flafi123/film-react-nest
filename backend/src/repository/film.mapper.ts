@@ -1,35 +1,24 @@
 import { FilmEntity } from './film.entity';
+
 export class FilmMapper {
-    private static cleanImagePath(path: string): string {
+  private static cleanImagePath(path: string): string {
     if (!path) return '';
-    
-    let cleaned = path;
-    
-    if (cleaned.includes('content/afishabg')) {
-      cleaned = cleaned.replace('content/afishabg', 'content/afisha/bg');
-    }
-    
-    if (!cleaned.startsWith('/')) {
-      cleaned = '/' + cleaned;
-    }
+
+    let cleaned = path.replace('content/afishabg', 'content/afisha/bg');
+    cleaned = cleaned.replace(/\/content\/afisha\/content\/afisha\//g, '/content/afisha/');
+    cleaned = '/' + cleaned.replace(/^\/+/, '');
     
     return cleaned;
   }
 
   static toResponseDto(film: FilmEntity) {
-    let correctedImage = film.image;
-    if (correctedImage.includes('content/afishabg')) {
-      correctedImage = correctedImage.replace(
-        'content/afishabg',
-        'content/afisha/bg',
-      );
-    }
     return {
       id: film.id,
       title: film.title,
       director: film.director,
       rating: film.rating,
       tags: film.tags,
+      // Применяем очистку ко всем полям картинок uniform-но
       image: FilmMapper.cleanImagePath(film.image),
       cover: FilmMapper.cleanImagePath(film.cover),
       about: film.about,

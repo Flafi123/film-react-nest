@@ -40,7 +40,7 @@ import { ScheduleEntity } from './repository/schedule.entity';
     TypeOrmModule.forFeature([FilmEntity, OrderEntity, ScheduleEntity]),
 
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
+      rootPath: path.join(__dirname, '..', 'public'),
       serveRoot: '/content/afisha',
     }),
   ],

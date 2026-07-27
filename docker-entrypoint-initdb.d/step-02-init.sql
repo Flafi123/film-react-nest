@@ -3,8 +3,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict o4aIfOpErizrRr1mE4X5jgZji2AQJG8pFrIQ0ZlEaAK5avWTzxeFNhEcST0f8kq
-
 -- Dumped from database version 16.4 (Debian 16.4-1.pgdg120+2)
 -- Dumped by pg_dump version 16.14
 
@@ -185,6 +183,3 @@ GRANT ALL ON SCHEMA public TO project_user;
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict o4aIfOpErizrRr1mE4X5jgZji2AQJG8pFrIQ0ZlEaAK5avWTzxeFNhEcST0f8kq
-
