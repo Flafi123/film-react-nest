@@ -1,0 +1,91 @@
+services:
+  database:
+    image: postgres:16.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - '${DATABASE_PORT}:5432'
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      
+  backend:
+    image: 'ghcr.io/${OWNER}/sp16_backend:latest'
+    environment:
+      PORT: 3000
+      DEBUG: '*'
+      DATABASE_DRIVER: ${DATABASE_DRIVER}
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_URL: 'postgres://database:5432/${DATABASE_NAME}'
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./backend/public:/app/public
+    networks:
+      - internal
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    image: 'ghcr.io/${OWNER}/sp16_frontend:latest'
+    environment:
+      VITE_BASE_URL: /
+      VITE_API_URL: /api/afisha
+      VITE_CDN_URL: /
+    volumes:
+      - frontend_build:/app/dist
+    networks:
+      - internal
+
+  server:
+    image: 'ghcr.io/${OWNER}/sp16_nginx:latest'
+    ports:
+      - '80:80'
+    volumes:
+      - frontend_build:/var/www
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - internal
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - '8080:80' # pgAdmin доступен на порту 8080
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - internal
+
+volumes:
+  db_data:
+  pgadmin-data:
+  frontend_build:
+
+networks:
+  internal:
