@@ -33,7 +33,7 @@ import { ScheduleEntity } from './repository/schedule.entity';
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         entities: [FilmEntity, OrderEntity, ScheduleEntity],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
 

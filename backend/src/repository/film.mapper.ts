@@ -1,7 +1,19 @@
 import { FilmEntity } from './film.entity';
 export class FilmMapper {
-  private static cleanImagePath(path: string): string {
-    return path.startsWith('/') ? path.slice(1) : path;
+    private static cleanImagePath(path: string): string {
+    if (!path) return '';
+    
+    let cleaned = path;
+    
+    if (cleaned.includes('content/afishabg')) {
+      cleaned = cleaned.replace('content/afishabg', 'content/afisha/bg');
+    }
+    
+    if (!cleaned.startsWith('/')) {
+      cleaned = '/' + cleaned;
+    }
+    
+    return cleaned;
   }
 
   static toResponseDto(film: FilmEntity) {
