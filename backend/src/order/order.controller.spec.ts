@@ -15,7 +15,7 @@ describe('OrderController', () => {
           useValue: {
             createOrder: jest.fn().mockResolvedValue({
               orderId: 'mock-database-id-999',
-              status: 'created'
+              status: 'created',
             }),
           },
         },
@@ -41,7 +41,7 @@ describe('OrderController', () => {
 
       expect(result).toEqual({
         orderId: 'mock-database-id-999',
-        status: 'created'
+        status: 'created',
       });
     });
   });

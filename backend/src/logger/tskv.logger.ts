@@ -31,7 +31,7 @@ export class TskvLogger implements LoggerService {
   warn(message: any, ...optionalParams: any[]) {
     console.log(this.formatMessage('warn', message, optionalParams));
   }
-  
+
   /**
    * Write a 'debug' level log.
    */

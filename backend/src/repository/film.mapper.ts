@@ -5,9 +5,12 @@ export class FilmMapper {
     if (!path) return '';
 
     let cleaned = path.replace('content/afishabg', 'content/afisha/bg');
-    cleaned = cleaned.replace(/\/content\/afisha\/content\/afisha\//g, '/content/afisha/');
+    cleaned = cleaned.replace(
+      /\/content\/afisha\/content\/afisha\//g,
+      '/content/afisha/',
+    );
     cleaned = '/' + cleaned.replace(/^\/+/, '');
-    
+
     return cleaned;
   }
 
