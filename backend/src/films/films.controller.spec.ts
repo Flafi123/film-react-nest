@@ -1,42 +1,66 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FilmsController } from './films.controller';
 import { FilmsService } from './films.service';
+import { FilmsRepository } from '../repository/films.repository';
 import { fixtures } from './films.fixtures';
-import { FilmsRepository } from '../repository/films.repository'
+import { NotFoundException } from '@nestjs/common';
 
 describe('FilmsController', () => {
-  let filmController: FilmsController;
+  let controller: FilmsController;
+  let repository: FilmsRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FilmsController],
       providers: [FilmsService],
-    }).useMocker((token) => {
+    })
+      .useMocker((token) => {
         if (token === FilmsRepository) {
           return {
-            films: {
-              findAll: jest.fn().mockResolvedValue(fixtures.film),
-              findSchedule: jest.fn().mockResolvedValue(fixtures.schedule),
-            }
+            findAll: jest.fn().mockResolvedValue([fixtures.mockFilmEntity]),
+            findById: jest.fn().mockResolvedValue(fixtures.mockFilmEntity),
           };
         }
-        throw new Error(`Token ${token.toString()} not found`);
-      }
-    ).compile();
+      })
+      .compile();
 
-    filmController = module.get<FilmsController>(FilmsController);
+    controller = module.get<FilmsController>(FilmsController);
+    repository = module.get<FilmsRepository>(FilmsRepository);
   });
 
+  it('должен быть определен', () => {
+    expect(controller).toBeDefined();
+  });
 
-    it('должен вызвать метод getFilms', async () => {
-      expect(filmController).toBeDefined();
-      const getFilmsResult = await filmController.getFilms();
-      expect(getFilmsResult).toEqual(fixtures.film);
-    });
+  describe('getFilms', () => {
+    it('должен вернуть список фильмов в формате { items, total }', async () => {
+      const result = await controller.getFilms();
 
-    it('должен вызвать метод getSchedule', async () => {
-      expect(filmController).toBeDefined();
-      const getScheduleResult = await filmController.getSchedule('1');
-      expect(getScheduleResult).toEqual(fixtures.schedule);
+      expect(repository.findAll).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        items: [fixtures.expectedFilmDto],
+        total: 1,
+      });
     });
   });
+
+  describe('getSchedule', () => {
+    it('должен вернуть расписание сессий фильма в формате { items, total }', async () => {
+      const result = await controller.getSchedule('film-123');
+
+      expect(repository.findById).toHaveBeenCalledWith('film-123');
+      expect(result).toEqual({
+        items: fixtures.expectedSessions,
+        total: fixtures.expectedSessions.length,
+      });
+    });
+
+    it('должен пробрасывать NotFoundException, если сервис не нашел фильм', async () => {
+      jest.spyOn(repository, 'findById').mockResolvedValue(null);
+
+      await expect(controller.getSchedule('unknown-id')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+});

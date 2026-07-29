@@ -1,28 +1,44 @@
-import { FilmResponseDto, ScheduleResponseDto } from './dto/films.dto';
-
-const film: FilmResponseDto = {
-    id: '1',
-    title: 'Фильм 1',
-    director: 'Директор 1',
-    rating: 5,
-    tags: ['тег 1', 'тег 2'],
-    image: 'https://example.com/image1.jpg',
-    cover: 'https://example.com/cover1.jpg',
-    about: 'Описание фильма 1',
-    description: 'Описание фильма 1',
+export const mockFilmEntity = {
+  id: 'film-123',
+  title: 'Интерстеллар',
+  director: 'Кристофер Нолан',
+  rating: 8.6,
+  tags: ['фантастика', 'драма'],
+  image: 'content/afishabg_interstellar.jpg',
+  cover: 'content/afishabg_interstellar_cover.jpg',
+  about: 'О фильме',
+  description: 'Длинное описание',
+  schedule: [
+    {
+      id: 'session-1',
+      daytime: '14:30',
+      price: 350,
+    },
+  ],
 };
 
-const schedule: ScheduleResponseDto = {
-      filmId: '1',
-      sessions:  [{
-        id: '1',
-        time: '10:00',
-        price: 100
-      }]
-}
+const expectedFilmDto = {
+  id: 'film-123',
+  title: 'Интерстеллар',
+  director: 'Кристофер Нолан',
+  rating: 8.6,
+  tags: ['фантастика', 'драма'],
+  image: '/content/afisha/bg_interstellar.jpg',
+  cover: '/content/afisha/bg_interstellar_cover.jpg',
+  about: 'О фильме',
+  description: 'Длинное описание',
+};
+
+const expectedSessions = [
+  {
+    id: 'session-1',
+    time: '14:30',
+    price: 350,
+  },
+];
 
 export const fixtures = {
-    film,
-    schedule
+  mockFilmEntity,
+  expectedFilmDto,
+  expectedSessions,
 };
-
