@@ -74,7 +74,7 @@ services:
     container_name: pgadmin4_container
     restart: always
     ports:
-      - "8080:80" # pgAdmin доступен на порту 8080
+      - "8080:80"  #pgAdmin доступен на порту 8080
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
