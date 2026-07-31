@@ -6,10 +6,6 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
-
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -22,23 +18,24 @@ services:
       interval: 3s
       timeout: 3s
       retries: 5
-
+      
   backend:
-    image: "ghcr.io/${OWNER}/film-react-nest/sp16_backend:latest"
+    image: "ghcr.io/${OWNER}/sp16_backend:latest"
+    restart: unless-stopped
     environment:
-      PORT: 3000
-      DEBUG: "*"
+      PORT: ${BACKEND_INTERNAL_PORT}
+      DEBUG: ${BACKEND_DEBUG}
       DATABASE_DRIVER: ${DATABASE_DRIVER}
-      DATABASE_HOST: database
-      DATABASE_PORT: 5432
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT_INTERNAL}
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_URL: "postgres://database:5432/${DATABASE_NAME}"
+      DATABASE_URL: ${DATABASE_URL}
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT}:${BACKEND_INTERNAL_PORT}"
     volumes:
-      - ./backend/public:/app/public
+      - afisha_data:/app/public/content/afisha
     networks:
       - internal
     depends_on:
@@ -46,23 +43,25 @@ services:
         condition: service_healthy
 
   frontend:
-    image: "ghcr.io/${OWNER}/film-react-nest/sp16_frontend:latest"
+    image: "ghcr.io/${OWNER}/sp16_frontend:latest"
+    restart: unless-stopped
     environment:
-      VITE_BASE_URL: /
-      VITE_API_URL: /api/afisha
-      VITE_CDN_URL: /
+      VITE_BASE_URL: ${VITE_BASE_URL}
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_CDN_URL: ${VITE_CDN_URL}
     volumes:
-      - frontend_build:/app/dist
+      - frontend_build:/var/www
     networks:
       - internal
 
   server:
-    image: "ghcr.io/${OWNER}/film-react-nest/sp16_server:latest"
+    image: "ghcr.io/${OWNER}/sp16_server:latest"
+    restart: unless-stopped
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     volumes:
-      - frontend_build:/var/www
-      - ./backend/public:/var/www/public
+      - frontend_build:/var/www:ro
+      - afisha_data:/var/data/content/afisha:ro
     depends_on:
       - frontend
       - backend
@@ -72,9 +71,9 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
-    restart: always
+    restart: unless-stopped
     ports:
-      - "8080:80"  #pgAdmin доступен на порту 8080
+      - "${PGADMIN_PORT}:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
@@ -87,6 +86,7 @@ volumes:
   db_data:
   pgadmin-data:
   frontend_build:
+  afisha_data:
 
 networks:
   internal:
