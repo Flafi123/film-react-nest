@@ -37,6 +37,10 @@ export class FilmMapper {
             id: session.id,
             time: session.daytime,
             price: session.price,
+            hall: session.hall,
+            rows: session.rows,
+            seats: session.seats,
+            taken: session.taken,
           }))
         : [],
     };
