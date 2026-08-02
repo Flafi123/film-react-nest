@@ -1,4 +1,3 @@
-# === Шаг 1: Сборка статики ===
 FROM node:20-alpine AS builder
 
 ARG VITE_BASE_URL

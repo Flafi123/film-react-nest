@@ -22,6 +22,8 @@ services:
   backend:
     image: "ghcr.io/${OWNER}/sp16_backend:latest"
     restart: unless-stopped
+    # build:
+    #   context: backend
     environment:
       PORT: ${BACKEND_INTERNAL_PORT}
       DEBUG: ${BACKEND_DEBUG}
@@ -45,6 +47,12 @@ services:
   frontend:
     image: "ghcr.io/${OWNER}/sp16_frontend:latest"
     restart: unless-stopped
+    # build:
+    #   context: frontend
+      # args:
+      #   VITE_BASE_URL: ${VITE_BASE_URL}
+      #   VITE_API_URL: ${VITE_API_URL}
+      #   VITE_CDN_URL: ${VITE_CDN_URL}
     environment:
       VITE_BASE_URL: ${VITE_BASE_URL}
       VITE_API_URL: ${VITE_API_URL}
@@ -57,6 +65,8 @@ services:
   server:
     image: "ghcr.io/${OWNER}/sp16_server:latest"
     restart: unless-stopped
+    # build:
+    #   context: nginx
     ports:
       - "${NGINX_PORT}:80"
     volumes:
@@ -73,7 +83,7 @@ services:
     container_name: pgadmin4_container
     restart: unless-stopped
     ports:
-      - "${PGADMIN_PORT}:80"
+      - "127.0.0.1:${PGADMIN_PORT}:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}

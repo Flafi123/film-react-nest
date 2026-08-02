@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:16.4
+    # image: postgres:16.4
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
@@ -20,7 +20,7 @@ services:
       retries: 5
       
   backend:
-    image: "ghcr.io/${OWNER}/sp16_backend:latest"
+    # image: "ghcr.io/${OWNER}/sp16_backend:latest"
     restart: unless-stopped
     build:
       context: backend
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: "ghcr.io/${OWNER}/sp16_frontend:latest"
+    # image: "ghcr.io/${OWNER}/sp16_frontend:latest"
     restart: unless-stopped
     build:
       context: frontend
@@ -63,7 +63,7 @@ services:
       - internal
 
   server:
-    image: "ghcr.io/${OWNER}/sp16_server:latest"
+    # image: "ghcr.io/${OWNER}/sp16_server:latest"
     restart: unless-stopped
     build:
       context: nginx
@@ -79,7 +79,7 @@ services:
       - internal
 
   pgadmin:
-    image: dpage/pgadmin4
+    # image: dpage/pgadmin4
     container_name: pgadmin4_container
     restart: unless-stopped
     ports:
