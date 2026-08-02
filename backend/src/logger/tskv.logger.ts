@@ -2,7 +2,11 @@ import { LoggerService, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TskvLogger implements LoggerService {
-  private formatMessage(level: string, message: unknown, ...optionalParams: unknown[]): string {
+  private formatMessage(
+    level: string,
+    message: unknown,
+    ...optionalParams: unknown[]
+  ): string {
     // Безопасное приведение message к строке
     let msgString = '';
     if (message instanceof Error) {
@@ -16,9 +20,10 @@ export class TskvLogger implements LoggerService {
     // Очистка от табуляций и переносов строк для формата TSKV
     const cleanMessage = msgString.replace(/[\t\n\r]/g, ' ');
 
-    const optional = optionalParams.length > 0
-      ? `optional=${JSON.stringify(optionalParams)}`
-      : '';
+    const optional =
+      optionalParams.length > 0
+        ? `optional=${JSON.stringify(optionalParams)}`
+        : '';
 
     return [`level=${level}`, `message=${cleanMessage}`, optional]
       .filter(Boolean)

@@ -16,21 +16,28 @@ export class OrderService {
 
   async createOrder(dto: CreateOrderDto) {
     if (!dto.tickets || dto.tickets.length === 0) {
-      throw new BadRequestException('Массив билетов (tickets) пуст или отсутствует');
+      throw new BadRequestException(
+        'Массив билетов (tickets) пуст или отсутствует',
+      );
     }
 
     const firstTicket = dto.tickets[0] as any;
-    
+
     const targetFilmId = firstTicket.film || dto.filmId || (dto as any).film_id;
-    const targetSessionId = firstTicket.session || dto.sessionId || (dto as any).session_id;
+    const targetSessionId =
+      firstTicket.session || dto.sessionId || (dto as any).session_id;
     const targetDay = firstTicket.day || dto.day;
     const targetTime = firstTicket.time || dto.time;
 
     if (!targetFilmId) {
-      throw new BadRequestException('Идентификатор фильма (film) отсутствует в данных билета');
+      throw new BadRequestException(
+        'Идентификатор фильма (film) отсутствует в данных билета',
+      );
     }
     if (!targetSessionId) {
-      throw new BadRequestException('Идентификатор сеанса (session) отсутствует в данных билета');
+      throw new BadRequestException(
+        'Идентификатор сеанса (session) отсутствует в данных билета',
+      );
     }
 
     const film = await this.filmsRepository.findById(targetFilmId);
@@ -74,7 +81,9 @@ export class OrderService {
       tickets: ticketsWithAddress,
     });
 
-    const resultOrderId = savedOrder ? ((savedOrder as any).id || (savedOrder as any)._id) : null;
+    const resultOrderId = savedOrder
+      ? (savedOrder as any).id || (savedOrder as any)._id
+      : null;
     const orderStringId = resultOrderId ? resultOrderId.toString() : 'success';
 
     const items = ticketsWithAddress.map((ticket) => ({
@@ -91,7 +100,7 @@ export class OrderService {
 
     return {
       total: items.length,
-      items: items
+      items: items,
     };
   }
 }
