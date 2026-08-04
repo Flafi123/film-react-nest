@@ -2,14 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { FilmsRepository } from './repository/films.repository';
 import { DataSource } from 'typeorm';
+import { TskvLogger } from './logger/tskv.logger';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import 'dotenv/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
   app.setGlobalPrefix('api/afisha');
   app.enableCors();
+  app.useLogger(new TskvLogger());
 
   const filmsRepository = app.get(FilmsRepository);
   const existingFilms = await filmsRepository.findAll();

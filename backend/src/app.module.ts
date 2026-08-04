@@ -33,14 +33,14 @@ import { ScheduleEntity } from './repository/schedule.entity';
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         entities: [FilmEntity, OrderEntity, ScheduleEntity],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
 
     TypeOrmModule.forFeature([FilmEntity, OrderEntity, ScheduleEntity]),
 
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', 'public', 'content', 'afisha'),
+      rootPath: path.join(__dirname, '..', 'public'),
       serveRoot: '/content/afisha',
     }),
   ],
